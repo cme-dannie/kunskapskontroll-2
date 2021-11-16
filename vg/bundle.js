@@ -1,0 +1,6 @@
+(()=>{var l=["Programmering","Stockholm","Studenter","Javascript","Afterwork"];function c(e){let t=Math.floor(Math.random()*e.length-1)+1;return e[t]}function w(e){return e.length===0}function I(e){return e.length>1}function L(e){return!new RegExp(/[a-z]/i).test(e)}function f(e){return w(e)||I(e)||L(e)}function p(e,t){return t.toLowerCase().includes(e)}function d(e,t){return t.split("").reduce((o,a,i)=>(e===a.toLowerCase()&&o.push(i),o),[])}function m(e,t,o){return o.map((a,i)=>e.includes(i)?t.charAt(i):a)}function h(e,t){return e===t.join("")}function g(){return{lives:5,get alive(){return this.lives>0},loseLife(){this.lives--}}}var r,n,u,s;function y(){let e=`
+              ${n.join(" ")}
+  
+              Lives left: ${s.lives}
+              Guesses made: ${u.join(", ")}
+              `;return prompt(e)}function j(e){if(f(e))return;if(!p(e,r)){s.loseLife(),u.push(e);return}let t=d(e,r);n=m(t,r,n)}function x(){r=c(l),n=r.split("").map(()=>"_"),u=[],s=g()}function v(){x();let e=!0;for(;e;){let t=y();if(t===null){alert("You have canceled the game");break}if(j(t.toLowerCase()),e=s.alive&&!h(r,n),!e){let o=s.alive?"You have won, congratulations!":`You have lost! The correct word was ${r}`;alert(o)}}}v();})();
