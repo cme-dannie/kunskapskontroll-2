@@ -55,12 +55,10 @@ function wordIsCompleted() {
 
 function processGuess(guess) {
   if (guessIsEmpty(guess) || guessIsTooLong(guess)) {
-    console.log("Guess is too long or empty");
     return;
   }
 
   if (guessIsIncorrect(guess)) {
-    console.log("Guess was incorrect, you will lose one life");
     lives--;
     return;
   }
@@ -88,12 +86,13 @@ function playGame() {
 
     processGuess(guess.toLowerCase());
 
-    if (livesAreDepleted()) {
-      alert(`You have lost! The correct word was ${word}`);
-      break;
-    } else if (wordIsCompleted()) {
-      alert("You have won, congratulations!");
-      break;
+    playing = !(livesAreDepleted() || wordIsCompleted());
+
+    if (!playing) {
+      const endMessage = livesAreDepleted()
+        ? `You have lost! The correct word was ${word}`
+        : "You have won, congratulations!";
+      alert(endMessage);
     }
   }
 }
