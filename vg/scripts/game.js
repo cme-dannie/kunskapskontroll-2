@@ -2,66 +2,50 @@ import { words } from "./config.js";
 
 import {
   pickRandomWord,
-  guessIsEmpty,
-  guessIsTooLong,
-  guessIsIncorrect,
+  guessIsInvalid,
+  guessDoesMatch,
   findPositionsOfLetter,
   revealWord,
   wordIsCompleted,
 } from "./word.js";
 
-import {
-  createPlayers,
-  getLivingPlayers,
-  allPlayersAreDead,
-  getWinningPlayer,
-} from "./player.js";
+import { createPlayer } from "./player.js";
 
 let word;
 let unrevealedWord;
-let players;
+let guesses;
+let player;
 
-function processGuess(guess, player) {
-  if (guessIsEmpty(guess) || guessIsTooLong(guess)) {
+function promptGuess() {
+  const text = `
+              ${unrevealedWord.join(" ")}
+  
+              Lives left: ${player.lives}
+              Guesses made: ${guesses.join(", ")}
+              `;
+  return prompt(text);
+}
+
+function processGuess(guess) {
+  if (guessIsInvalid(guess)) {
     return;
   }
 
-  if (guessIsIncorrect(guess, word)) {
+  if (!guessDoesMatch(guess, word)) {
     player.loseLife();
+    guesses.push(guess);
     return;
   }
 
   const letterPositions = findPositionsOfLetter(guess, word);
-
   unrevealedWord = revealWord(letterPositions, word, unrevealedWord);
-}
-
-function letPlayersGuess() {
-  for (const player of getLivingPlayers(players)) {
-    const text = `
-              ${player.name}
-  
-              Guess a character
-  
-              ${unrevealedWord.join(" ")}
-  
-              Lives left: ${player.lives}
-              `;
-
-    const guess = prompt(text);
-    processGuess(guess.toLowerCase(), player);
-
-    if (wordIsCompleted(word, unrevealedWord)) {
-      player.win();
-      break;
-    }
-  }
 }
 
 function init() {
   word = pickRandomWord(words);
   unrevealedWord = word.split("").map(() => "_");
-  players = createPlayers();
+  guesses = [];
+  player = createPlayer();
 }
 
 function playGame() {
@@ -70,16 +54,21 @@ function playGame() {
   let playing = true;
 
   while (playing) {
-    letPlayersGuess();
+    const guess = promptGuess();
 
-    playing = !(
-      allPlayersAreDead(players) || wordIsCompleted(word, unrevealedWord)
-    );
+    if (guess === null) {
+      alert("You have canceled the game");
+      break;
+    }
+
+    processGuess(guess.toLowerCase());
+
+    playing = player.alive && !wordIsCompleted(word, unrevealedWord);
 
     if (!playing) {
-      const endMessage = allPlayersAreDead(players)
-        ? `Everyone has lost! The correct word was ${word}`
-        : `${getWinningPlayer(players).name} has won, congratulations!`;
+      const endMessage = !player.alive
+        ? `You have lost! The correct word was ${word}`
+        : "You have won, congratulations!";
       alert(endMessage);
     }
   }

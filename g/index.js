@@ -8,19 +8,11 @@ const words = [
 
 let word;
 let revealedWord;
-let lives = 5;
+let lives;
 
 function pickRandomWord() {
   const index = Math.floor(Math.random() * words.length - 1) + 1;
   return words[index];
-}
-
-function guessIsEmpty(guess) {
-  return guess.length === 0;
-}
-
-function guessIsTooLong(guess) {
-  return guess.length > 1;
 }
 
 function guessIsIncorrect(guess) {
@@ -37,7 +29,7 @@ function findPositionsOfLetter(letter) {
 }
 
 function revealWord(positions) {
-  revealedWord = revealedWord.map((char, i) => {
+  return revealedWord.map((char, i) => {
     if (positions.includes(i)) {
       return word.charAt(i);
     }
@@ -54,10 +46,6 @@ function wordIsCompleted() {
 }
 
 function processGuess(guess) {
-  if (guessIsEmpty(guess) || guessIsTooLong(guess)) {
-    return;
-  }
-
   if (guessIsIncorrect(guess)) {
     lives--;
     return;
@@ -65,25 +53,27 @@ function processGuess(guess) {
 
   const letterPositions = findPositionsOfLetter(guess);
 
-  revealWord(letterPositions);
+  revealedWord = revealWord(letterPositions);
+}
+
+function init() {
+  word = pickRandomWord();
+  revealedWord = word.split("").map(() => "_");
+  lives = 5;
 }
 
 function playGame() {
-  word = pickRandomWord();
-  revealedWord = word.split("").map(() => "_");
+  init();
 
   let playing = true;
 
   while (playing) {
     const text = `
-        Guess a character
-
         ${revealedWord.join(" ")}
 
         Lives left: ${lives}
         `;
     const guess = prompt(text);
-
     processGuess(guess.toLowerCase());
 
     playing = !(livesAreDepleted() || wordIsCompleted());

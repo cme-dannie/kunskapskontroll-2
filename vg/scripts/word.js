@@ -11,8 +11,20 @@ function guessIsTooLong(guess) {
   return guess.length > 1;
 }
 
-function guessIsIncorrect(guess, word) {
-  return word.toLowerCase().indexOf(guess) === -1;
+function guessIsNotAlphabetical(guess) {
+  return !new RegExp(/[a-z]/i).test(guess);
+}
+
+function guessIsInvalid(guess) {
+  return (
+    guessIsEmpty(guess) ||
+    guessIsTooLong(guess) ||
+    guessIsNotAlphabetical(guess)
+  );
+}
+
+function guessDoesMatch(guess, word) {
+  return word.toLowerCase().includes(guess);
 }
 
 function findPositionsOfLetter(letter, word) {
@@ -39,9 +51,8 @@ function wordIsCompleted(word, unrevealedWord) {
 
 export {
   pickRandomWord,
-  guessIsEmpty,
-  guessIsTooLong,
-  guessIsIncorrect,
+  guessIsInvalid,
+  guessDoesMatch,
   findPositionsOfLetter,
   revealWord,
   wordIsCompleted,
